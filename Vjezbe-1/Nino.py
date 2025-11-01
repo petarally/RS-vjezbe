@@ -17,47 +17,26 @@ def validiraj_broj_telefona(broj_telefona: str) -> dict:
 
 
 def usporedba_s_bazom(broj_telefona: str, baza: list) -> dict:
-    rezultat = {}
-    if(broj_telefona[:2] == '01'):
-        broj_ostatak = broj_telefona[2:]
-        index = baza.index(next(filter(lambda d: d['pozivni_broj'] == '01', baza), None))
-        rezultat["pozivni_broj"] = '01'
-        rezultat["broj_ostatak"] = broj_ostatak
-        rezultat["vrsta"] = baza[index]["vrsta"]
-        rezultat["mjesto"] = baza[index]["mjesto"]
-        rezultat["operater"] = None
-        if(len(broj_ostatak) == 6 or len(broj_ostatak) == 7):
-            rezultat["validan"] = True
-        else:
-            rezultat["validan"] = False
-    elif(broj_telefona[:4] == '0800'):
-        broj_ostatak = broj_telefona[4:]
-        index = baza.index(next(filter(lambda d: d['pozivni_broj'] == '0800', baza), None))
-        rezultat["pozivni_broj"] = '0800'
-        rezultat["broj_ostatak"] = broj_ostatak
-        rezultat["vrsta"] = baza[index]["vrsta"]
-        rezultat["mjesto"] = baza[index]["mjesto"]
-        rezultat["operater"] = None
-        if(len(broj_ostatak) == 6):
-            rezultat["validan"] = True
-        else:
-            rezultat["validan"] = False
+    if broj_telefona.startswith('0') == False:
+        broj_telefona = '0' + broj_telefona
+    if broj_telefona[:4] == '0800':
+        pozivni_broj = '0800'
+        validne_duljine = {6}
+    elif broj_telefona[:2] == '01':
+        pozivni_broj = '01'
+        validne_duljine = {6, 7}
     else:
         pozivni_broj = broj_telefona[:3]
-        broj_ostatak = broj_telefona[3:]
-        index = baza.index(next(filter(lambda d: d['pozivni_broj'] == pozivni_broj, baza), None))
-        rezultat["pozivni_broj"] = pozivni_broj
-        rezultat["broj_ostatak"] = broj_ostatak
-        rezultat["vrsta"] = baza[index]["vrsta"]
-        rezultat["mjesto"] = baza[index]["mjesto"]
-        rezultat["operater"] = None
-        if(index is not None and len(broj_ostatak) == 6 or len(broj_ostatak) == 7):
-            rezultat["validan"] = True
-        else:
-            rezultat["validan"] = False
-    return rezultat  
+        validne_duljine = {6, 7}
+    
+    broj_ostatak = broj_telefona[len(pozivni_broj):]
+    zapis_brojevi = next(filter(lambda d: pozivni_broj in (d['pozivni_broj'] if isinstance(d['pozivni_broj'], list) else [d['pozivni_broj']]), baza), None)
 
-
-# TODO:
-# - Problem s 098 i 099 pozivnim brojevima
-# - Problem s upisom brojeva bez 0 (1 umjesto 01)
+    return {
+        "pozivni_broj": pozivni_broj,
+        "broj_ostatak": broj_ostatak,
+        "vrsta": zapis_brojevi["vrsta"] if zapis_brojevi else None,
+        "mjesto": zapis_brojevi["mjesto"] if zapis_brojevi else None,
+        "operater": None,
+        "validan": len(broj_ostatak) in validne_duljine
+    } 
