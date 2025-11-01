@@ -2,7 +2,6 @@ from podatci import tablica_brojeva
 import re
 
 def validiraj_broj_telefona(broj_telefona: str) -> dict:
-    validacija = {}
     # Broj telefona sadrži samo znamenke
     if isinstance(broj_telefona, str):
         broj_telefona = re.sub(r'\D+', '', broj_telefona)
@@ -12,8 +11,7 @@ def validiraj_broj_telefona(broj_telefona: str) -> dict:
     elif(broj_telefona[0:5] == '00385'):
         broj_telefona = broj_telefona[5:]
     # Provjera lokalnog broja telefona
-    validacija = usporedba_s_bazom(broj_telefona, tablica_brojeva)
-    return validacija
+    return usporedba_s_bazom(broj_telefona, tablica_brojeva)
 
 
 def usporedba_s_bazom(broj_telefona: str, baza: list) -> dict:
